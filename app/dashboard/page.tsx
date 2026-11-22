@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { supabase, supabasePublishableKey, supabaseUrl } from "@/lib/supabase";
+import { consumeWelcomeHeartsPending, welcomeHeartsEvent } from "@/lib/welcome-hearts";
 
 type Member = { display_name: string; role: "admin" | "member" };
 type Mood = { id: string; score: number; note: string | null; mood_date: string; user_id: string };
@@ -838,6 +839,10 @@ export default function Dashboard() {
       const { data: profile } = await supabase.from("site_members").select("display_name,role").eq("user_id", data.user.id).maybeSingle();
       if (!profile) { await supabase.auth.signOut(); router.replace("/"); return; }
       setMember(profile as Member);
+      const shouldPlayWelcomeHearts = consumeWelcomeHeartsPending();
+      if (profile.display_name === "Elif" && shouldPlayWelcomeHearts) {
+        document.dispatchEvent(new Event(welcomeHeartsEvent));
+      }
       await loadAll(data.user.id);
     })();
     return () => { active = false; };

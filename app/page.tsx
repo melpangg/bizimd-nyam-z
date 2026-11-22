@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { markWelcomeHeartsPending } from "@/lib/welcome-hearts";
 
 type Person = "emre" | "elif";
 
@@ -65,6 +66,7 @@ export default function Home() {
         setError("Oturum başlatılamadı. Lütfen tekrar deneyin.");
         return;
       }
+      markWelcomeHeartsPending(person);
       router.replace("/dashboard");
     } catch {
       setError("Bağlantı kurulamadı. Lütfen tekrar deneyin.");
